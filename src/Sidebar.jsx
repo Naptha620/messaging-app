@@ -7,7 +7,7 @@ export default function Sidebar({ user, users, setSelectedFriend, selectedFriend
         //sidebar
         <div 
             id="sidebar"
-            className="w-64 bg-white border-r border-gray-200 flex flex-col z-20">
+            className={`${selectedFriend ? 'hidden md:flex' : 'flex'} w-full md:w-64 bg-white border-r border-gray-200 flex-col z-20`}>
 
             {/*padding inside sidebar */}
             <div 

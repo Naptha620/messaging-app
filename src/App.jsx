@@ -221,7 +221,7 @@ function App () {
         {!selectedFriend ? (
           <div
             id="welcome-screen"
-            className="flex-1 flex flex-col items-center justify-center bg-gray-50 text-gray-500">
+            className="hidden md:flex-1 md:flex md:flex-col md:items-center md:justify-center md:bg-gray-50 md:text-gray-500">
             <div
               className="text-6xl mb-4">
               💬
@@ -241,7 +241,7 @@ function App () {
         //main chat component
         <div 
           id="main-chat"
-          className="flex-1 flex flex-col">
+          className={`${!selectedFriend ? 'hidden md:flex' : 'flex'} flex-1 flex-col w-full`}>
 
           {/*topbar component */}
           <Topbar
@@ -249,6 +249,7 @@ function App () {
             //handing the "user" variable to this component, props
             user={user}
             selectedFriend={selectedFriend}
+            setSelectedFriend={setSelectedFriend}
           />
 
           {/*chat history component */}

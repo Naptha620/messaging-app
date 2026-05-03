@@ -44,7 +44,8 @@ export default function MessageInput({ newMessage, setNewMessage, handleSendMess
 
         //simulates a click on the send button when the "Enter" key is pressed
         onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
+          const isMobile = window.innerWidth < 768;
+          if (e.key === "Enter" && !e.shiftKey && !isMobile) {
             e.preventDefault();
             handleSendMessage();
           }
