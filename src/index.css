@@ -14,3 +14,35 @@
 .animate-pop-in {
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
+
+
+@keyframes deleteRight {
+    0% { 
+        opacity: 0; 
+        transform: translateX(40px) scale(0.5); 
+    }
+    100% {
+        opacity: 100;
+        transform: translateX(0) scale(1); 
+    }
+}
+
+.animate-delete-right {
+    animation: deleteRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+
+@keyframes deleteLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-40) scale(0.5);
+    }
+    100% {
+        opacity: 100;
+        transform: translateX(0) scale(1);
+    }
+}
+
+.animate-delete-left {
+    animation: deleteLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}

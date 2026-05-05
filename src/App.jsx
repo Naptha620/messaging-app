@@ -35,6 +35,8 @@ function App () {
 
   const [selectedFriend, setSelectedFriend] = useState(null);
 
+  const [chatMetadata, setChatMetadata] = useState(null);
+
   // "useEffect" -- runs once on app load
   useEffect(() => {
 
@@ -103,40 +105,56 @@ function App () {
     const chatId = user.uid > selectedFriend.uid ? `${user.uid}_${selectedFriend.uid}` : `${selectedFriend.uid}_${user.uid}`;
 
     const chatRoomRef = doc(db, "chats", chatId);
-    setDoc(chatRoomRef, {
-      unreadStatus: {
-        [user.uid]: false
+
+    const unsubscribeRoom = onSnapshot(chatRoomRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setChatMetadata(snapshot.data());
       }
-    }, { merge: true });
-
+    }); 
+    
     const messagesQuery = query(collection(db, "chats", chatId, "messages"), orderBy("createdAt", "asc"));
-
+    
     // "onSnapshot" -- runs constantly, looking for any changes in the "messageQuery" data. Like a background service
     const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
-
+      
       //creates a "fetchedMessages" empty array, a container for holding each new message when the database messages change(courtesy of onSnapshot)
       const fetchedMessages = [];
-
+      
       //a loop that "iterates" over every "datapoint/message" that |onSnapshot| proviedes
       snapshot.forEach((doc) => {
-
+        
         //"pushes" the current |'object of data' or 'message'|, containing the 'id'(unique message identifier) and 'data'(text) of said message, to the end of the "fetchedMessages" array
         fetchedMessages.push({ id: doc.id, ...doc.data() });
       });
-
+      
       //sets the final "looped through" 'fetchedMessage' array into the "messages" variable
       setMessages(fetchedMessages);
+
+      const friendMessages = fetchedMessages.filter(msg => msg.uid !== user.uid);
+      if (friendMessages.length > 0) {
+        const lastMessage = friendMessages[friendMessages.length - 1];
+
+        setDoc(chatRoomRef, {
+          unreadStatus: { [user.uid]: false },
+          lastRead: { [user.uid]: lastMessage.id }
+        }, { merge: true });
+      } else {
+        setDoc(chatRoomRef, {
+          unreadStatus: { [user.uid]: false }
+        }, { merge: true });
+      }
     }, 
     (error) => {
 
       //catches and throws error information in the console
       console.error("Firestore Listener Error: ", error);
-    }
-  );
+    });
 
     //cleanup function, turns off the snapshot service listener when useEffect is closed
-    return () => unsubscribeMessages();
-
+    return () => {
+      unsubscribeMessages();
+      unsubscribeRoom();
+    };
     //also runs useEffect when the "user" variable changes
   }, [user, selectedFriend]);
 
@@ -258,6 +276,8 @@ function App () {
           //handing props
             messages={messages}
             user={user}
+            selectedFriend={selectedFriend}
+            chatMetadata={chatMetadata}
           />
 
           <MessageInput
